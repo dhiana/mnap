@@ -49,71 +49,70 @@ using namespace std;
 #define TOLG 1e-9
 #define DEBUG
 
-typedef struct elemento { /* Elemento do netlist */
-  char nome[MAX_NOME];
-  double valor;
-  int a,b,c,d,x,y;
+typedef struct elemento{ /* Elemento do netlist */
+    char nome[ MAX_NOME ];
+    double valor;
+    int a, b, c, d, x, y;
 } elemento;
 
-elemento netlist[MAX_ELEM]; /* Netlist */
+elemento netlist[ MAX_ELEM ]; /* Netlist */
 
 int
-  ne, /* Elementos */
-  nv, /* Variaveis */
-  nn, /* Nos */
-  i,j,k;
+    ne, /* Elementos */
+    nv, /* Variaveis */
+    nn, /* Nos */
+    i, j, k;
 
 char
 /* Foram colocados limites nos formatos de leitura para alguma protecao
    contra excesso de caracteres nestas variaveis */
-  nomearquivo[MAX_LINHA+1],
-  tipo,
-  na[MAX_NOME],nb[MAX_NOME],nc[MAX_NOME],nd[MAX_NOME],
-  lista[MAX_NOS+1][MAX_NOME+2], /*Tem que caber jx antes do nome */
-  txt[MAX_LINHA+1],
-  *p;
+    nomearquivo[MAX_LINHA+1],
+    tipo,
+    na[MAX_NOME], nb[MAX_NOME], nc[MAX_NOME], nd[MAX_NOME],
+    lista[MAX_NOS+1][MAX_NOME+2], /*Tem que caber jx antes do nome */
+    txt[MAX_LINHA+1],
+    *p;
 FILE *arquivo;
 
 double
-  g,
-  Yn[MAX_NOS+1][MAX_NOS+2];
+    g,
+    Yn[MAX_NOS+1][MAX_NOS+2];
 
 /* Resolucao de sistema de equacoes lineares.
    Metodo de Gauss-Jordan com condensacao pivotal */
-int resolversistema(void)
-{
-  int i,j,l, a;
-  double t, p;
+int resolversistema( void ){
+    int i, j, l, a;
+    double t, p;
 
-  for (i=1; i<=nv; i++) {
-    t=0.0;
-    a=i;
-    for (l=i; l<=nv; l++) {
-      if (fabs(Yn[l][i])>fabs(t)) {
-	a=l;
-	t=Yn[l][i];
-      }
+    for( i = 1; i <= nv; i++){
+        t = 0.0;
+        a = i;
+        for( l = i; l <= nv; l++){
+            if( fabs( Yn[l][i] ) > fabs( t ) ) {
+                a = l;
+                t = Yn[l][i];
+            }
+        }
+        if( i != a){
+            for( l = 1; l <= nv + 1; l++){
+                p = Yn[i][l];
+                Yn[i][l] = Yn[a][l];
+                Yn[a][l] = p;
+            }
+        }
+        if( fabs( t ) < TOLG ){
+          cout << "Sistema singular" << endl;
+          return 1;
+        }
+        for( j = nv + 1; j > 0; j--){  /* Basta j>i em vez de j>0 */
+            Yn[i][j] /= t;
+            p = Yn[i][j];
+            for( l = 1; l <= nv; l++){
+                if( l != i )
+                 Yn[l][j] -= Yn[l][i] * p;
+            }
+        }
     }
-    if (i!=a) {
-      for (l=1; l<=nv+1; l++) {
-	p=Yn[i][l];
-	Yn[i][l]=Yn[a][l];
-	Yn[a][l]=p;
-      }
-    }
-    if (fabs(t)<TOLG) {
-      cout << "Sistema singular" << endl;
-      return 1;
-    }
-    for (j=nv+1; j>0; j--) {  /* Basta j>i em vez de j>0 */
-      Yn[i][j] /= t;
-      p=Yn[i][j];
-      for (l=1; l<=nv; l++) {
-	if (l!=i)
-	  Yn[l][j]-=Yn[l][i]*p;
-      }
-    }
-  }
   return 0;
 }
 
@@ -245,12 +244,10 @@ int main(void)
       cout << netlist[i].nome << " " << netlist[i].a << " " << netlist[i].b << " " << netlist[i].valor << endl;
     }
     else if (tipo=='G' || tipo=='E' || tipo=='F' || tipo=='H') {
-      //printf("%s %d %d %d %d %g\n",netlist[i].nome,netlist[i].a,netlist[i].b,netlist[i].c,netlist[i].d,netlist[i].valor);
       cout << netlist[i].nome << " " << netlist[i].a << " " << netlist[i].b << " "
            << netlist[i].c << " " << netlist[i].d   << " " << netlist[i].valor << endl;
     }
     else if (tipo=='O') {
-      //printf("%s %d %d %d %d\n",netlist[i].nome,netlist[i].a,netlist[i].b,netlist[i].c,netlist[i].d);
       cout << netlist[i].nome << " " << netlist[i].a << " " << netlist[i].b << " "
            << netlist[i].c << " " << netlist[i].d   << endl;
     }
