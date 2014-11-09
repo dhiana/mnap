@@ -22,6 +22,11 @@
 *.a
 *.lib
 
+# Qt project files
+*.pro
+*.user
+*.autosave
+
 # Executables
 *.exe
 *.out
