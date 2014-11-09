@@ -50,12 +50,12 @@ using namespace std;
 #define DEBUG
 
 typedef struct elemento{ /* Elemento do netlist */
-    char nome[ MAX_NOME ];
+    char nome[MAX_NOME];
     double valor;
     int a, b, c, d, x, y;
 } elemento;
 
-elemento netlist[ MAX_ELEM ]; /* Netlist */
+elemento netlist[MAX_ELEM]; /* Netlist */
 
 int
     ne, /* Elementos */
@@ -84,127 +84,127 @@ int resolversistema( void ){
     int i, j, l, a;
     double t, p;
 
-    for( i = 1; i <= nv; i++){
+    for( i = 1; i <= nv; i++ ){
         t = 0.0;
         a = i;
-        for( l = i; l <= nv; l++){
+        for( l = i; l <= nv; l++ ){
             if( fabs( Yn[l][i] ) > fabs( t ) ) {
                 a = l;
                 t = Yn[l][i];
             }
         }
         if( i != a){
-            for( l = 1; l <= nv + 1; l++){
+            for( l = 1; l <= nv + 1; l++ ){
                 p = Yn[i][l];
                 Yn[i][l] = Yn[a][l];
                 Yn[a][l] = p;
             }
         }
         if( fabs( t ) < TOLG ){
-          cout << "Sistema singular" << endl;
-          return 1;
+            cout << "Sistema singular" << endl;
+            return 1;
         }
-        for( j = nv + 1; j > 0; j--){  /* Basta j>i em vez de j>0 */
+        for( j = nv + 1; j > 0; j-- ){  /* Basta j>i em vez de j>0 */
             Yn[i][j] /= t;
             p = Yn[i][j];
-            for( l = 1; l <= nv; l++){
+            for( l = 1; l <= nv; l++ ){
                 if( l != i )
-                 Yn[l][j] -= Yn[l][i] * p;
+                    Yn[l][j] -= Yn[l][i] * p;
             }
         }
     }
-  return 0;
+    return 0;
 }
 
 /* Rotina que conta os nos e atribui numeros a eles */
-int numero(char *nome)
-{
-  int i,achou;
+int numero( char *nome ){
+    int i, achou;
 
-  i=0; achou=0;
-  while (!achou && i<=nv)
-    if (!(achou=!strcmp(nome,lista[i]))) i++;
-  if (!achou) {
-    if (nv==MAX_NOS) {
-      cout << "O programa so aceita ate " << nv <<  " nos" << endl;
-      exit(1);
+    i = 0; achou = 0;
+    while( !achou && i <= nv )
+        if ( !( achou = !strcmp( nome, lista[i] ) ) )
+            i++;
+    if ( !achou ){
+        if ( nv == MAX_NOS){
+            cout << "O programa so aceita ate " << nv <<  " nos" << endl;
+            exit( 1 );
+        }
+        nv++;
+        strcpy( lista[nv], nome );
+        return nv; /* novo no */
     }
-    nv++;
-    strcpy(lista[nv],nome);
-    return nv; /* novo no */
-  }
-  else {
-    return i; /* no ja conhecido */
-  }
+    else{
+        return i; /* no ja conhecido */
+    }
 }
 
-int main(void)
-{
+int main( void ){
     #if defined(WIN32) || defined(_WIN32)
     system( "cls" );
     #else
     system( "clear" );
     #endif
-  cout << "Programa demonstrativo de analise nodal modificada" << endl;
-  cout << "Por Antonio Carlos M. de Queiroz - acmq@coe.ufrj.br" << endl;
-  cout << "Versao " << versao << endl;
- denovo:
-  /* Leitura do netlist */
-  ne=0; nv=0; strcpy(lista[0],"0");
-  cout << "Nome do arquivo com o netlist (ex: mna.net): ";
-  scanf("%50s",nomearquivo);
-  arquivo=fopen(nomearquivo,"r");
-  if (arquivo==0) {
-    cout << "Arquivo " << nomearquivo << " inexistente" << endl;
-    goto denovo;
-  }
-  cout << "Lendo netlist:" << endl;
-  fgets(txt,MAX_LINHA,arquivo);
-  cout << "Titulo: " << txt;
-  while (fgets(txt,MAX_LINHA,arquivo)) {
-    ne++; /* Nao usa o netlist[0] */
-    if (ne>MAX_ELEM) {
-      cout << "O programa so aceita ate "<< MAX_ELEM << " elementos" << endl;
-      exit(1);
+    cout << "Programa demonstrativo de analise nodal modificada" << endl;
+    cout << "Por Antonio Carlos M. de Queiroz - acmq@coe.ufrj.br" << endl;
+    cout << "Versao " << versao << endl;
+    denovo:
+    /* Leitura do netlist */
+    ne = 0; nv = 0; strcpy( lista[0], "0" );
+    cout << "Nome do arquivo com o netlist (ex: mna.net): ";
+    scanf( "%50s", nomearquivo );
+    arquivo = fopen( nomearquivo, "r" );
+    if( arquivo == 0 ){
+        cout << "Arquivo " << nomearquivo << " inexistente" << endl;
+        goto denovo;
     }
-    txt[0]=toupper(txt[0]);
-    tipo=txt[0];
-    sscanf(txt,"%10s",netlist[ne].nome);
-    p=txt+strlen(netlist[ne].nome); /* Inicio dos parametros */
-    /* O que e lido depende do tipo */
-    if (tipo=='R' || tipo=='I' || tipo=='V') {
-      sscanf(p,"%10s%10s%lg",na,nb,&netlist[ne].valor);
-      cout << netlist[ne].nome << " " << na << " " << nb << " " << netlist[ne].valor << endl;
-      netlist[ne].a=numero(na);
-      netlist[ne].b=numero(nb);
+    cout << "Lendo netlist:" << endl;
+    fgets( txt, MAX_LINHA, arquivo );
+    cout << "Titulo: " << txt;
+    while( fgets( txt, MAX_LINHA, arquivo ) ){
+        ne++; /* Nao usa o netlist[0] */
+        if ( ne > MAX_ELEM ){
+            cout << "O programa so aceita ate " << MAX_ELEM << " elementos" << endl;
+            exit( 1 );
+        }
+        txt[0] = toupper( txt[0] );
+        tipo = txt[0];
+        sscanf( txt, "%10s", netlist[ne].nome );
+        p = txt + strlen( netlist[ne].nome ); /* Inicio dos parametros */
+        /* O que e lido depende do tipo */
+        if( tipo == 'R' || tipo == 'I' || tipo == 'V' ){
+            sscanf( p, "%10s%10s%lg", na, nb, &netlist[ne].valor );
+            cout << netlist[ne].nome << " " << na << " " << nb << " " << netlist[ne].valor << endl;
+            netlist[ne].a = numero( na );
+            netlist[ne].b = numero( nb );
+        }
+        else if( tipo == 'G' || tipo == 'E' || tipo == 'F' || tipo == 'H'){
+            sscanf( p, "%10s%10s%10s%10s%lg", na, nb, nc, nd, &netlist[ne].valor );
+            cout << netlist[ne].nome << " " << na << " " << nb << " " << nc << " "
+                 << nd << " "<< netlist[ne].valor << endl;
+            netlist[ne].a = numero( na );
+            netlist[ne].b = numero( nb );
+            netlist[ne].c = numero( nc );
+            netlist[ne].d = numero( nd );
+        }
+        else if( tipo == 'O' ){
+            sscanf( p, "%10s%10s%10s%10s", na, nb, nc, nd );
+            cout << netlist[ne].nome << " " << na << " " << nb << " " << nc << " " << nd << " " << endl;
+            netlist[ne].a = numero( na );
+            netlist[ne].b = numero( nb );
+            netlist[ne].c = numero( nc );
+            netlist[ne].d = numero( nd );
+        }
+        else if( tipo == '*' ){ /* Comentario comeca com "*" */
+            cout << "Comentario: " << txt;
+            ne--;
+        }
+        else{
+            cout << "Elemento desconhecido: " << txt << endl;
+            getch();
+            exit( 1 );
+        }
     }
-    else if (tipo=='G' || tipo=='E' || tipo=='F' || tipo=='H') {
-      sscanf(p,"%10s%10s%10s%10s%lg",na,nb,nc,nd,&netlist[ne].valor);
-      cout << netlist[ne].nome << " " << na << " " << nb << " " << nc << " " << nd << " " << netlist[ne].valor << endl;
-      netlist[ne].a=numero(na);
-      netlist[ne].b=numero(nb);
-      netlist[ne].c=numero(nc);
-      netlist[ne].d=numero(nd);
-    }
-    else if (tipo=='O') {
-      sscanf(p,"%10s%10s%10s%10s",na,nb,nc,nd);
-      cout << netlist[ne].nome << " " << na << " " << nb << " " << nc << " " << nd << " " << endl;
-      netlist[ne].a=numero(na);
-      netlist[ne].b=numero(nb);
-      netlist[ne].c=numero(nc);
-      netlist[ne].d=numero(nd);
-    }
-    else if (tipo=='*') { /* Comentario comeca com "*" */
-      cout << "Comentario: " << txt;
-      ne--;
-    }
-    else {
-      cout << "Elemento desconhecido: " << txt << endl;
-      getch();
-      exit(1);
-    }
-  }
-  fclose(arquivo);
+    fclose( arquivo );
   /* Acrescenta variaveis de corrente acima dos nos, anotando no netlist */
   nn=nv;
   for (i=1; i<=ne; i++) {
