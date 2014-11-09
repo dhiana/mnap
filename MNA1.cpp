@@ -31,6 +31,11 @@ Os nos podem ser nomes
 */
 
 #define versao "1.0i - 03/11/2013"
+
+#include <iostream>
+
+using namespace std;
+
 #include <stdio.h>
 #include <conio.h>
 #include <string.h>
@@ -97,7 +102,7 @@ int resolversistema(void)
       }
     }
     if (fabs(t)<TOLG) {
-      printf("Sistema singular\n");
+      cout << "Sistema singular" << endl;
       return 1;
     }
     for (j=nv+1; j>0; j--) {  /* Basta j>i em vez de j>0 */
@@ -122,7 +127,7 @@ int numero(char *nome)
     if (!(achou=!strcmp(nome,lista[i]))) i++;
   if (!achou) {
     if (nv==MAX_NOS) {
-      printf("O programa so aceita ate %d nos\n",nv);
+      cout << "O programa so aceita ate " << nv <<  " nos" << endl;
       exit(1);
     }
     nv++;
@@ -136,27 +141,31 @@ int numero(char *nome)
 
 int main(void)
 {
-  clrscr();
-  printf("Programa demonstrativo de analise nodal modificada\n");
-  printf("Por Antonio Carlos M. de Queiroz - acmq@coe.ufrj.br\n");
-  printf("Versao %s\n",versao);
+    #if defined(WIN32) || defined(_WIN32)
+    system( "cls" );
+    #else
+    system( "clear" );
+    #endif
+  cout << "Programa demonstrativo de analise nodal modificada" << endl;
+  cout << "Por Antonio Carlos M. de Queiroz - acmq@coe.ufrj.br" << endl;
+  cout << "Versao " << versao << endl;
  denovo:
   /* Leitura do netlist */
   ne=0; nv=0; strcpy(lista[0],"0");
-  printf("Nome do arquivo com o netlist (ex: mna.net): ");
+  cout << "Nome do arquivo com o netlist (ex: mna.net): ";
   scanf("%50s",nomearquivo);
   arquivo=fopen(nomearquivo,"r");
   if (arquivo==0) {
-    printf("Arquivo %s inexistente\n",nomearquivo);
+    cout << "Arquivo " << nomearquivo << " inexistente" << endl;
     goto denovo;
   }
-  printf("Lendo netlist:\n");
+  cout << "Lendo netlist:" << endl;
   fgets(txt,MAX_LINHA,arquivo);
-  printf("Titulo: %s",txt);
+  cout << "Titulo: " << txt;
   while (fgets(txt,MAX_LINHA,arquivo)) {
     ne++; /* Nao usa o netlist[0] */
     if (ne>MAX_ELEM) {
-      printf("O programa so aceita ate %d elementos\n",MAX_ELEM);
+      cout << "O programa so aceita ate "<< MAX_ELEM << " elementos" << endl;
       exit(1);
     }
     txt[0]=toupper(txt[0]);
@@ -166,13 +175,13 @@ int main(void)
     /* O que e lido depende do tipo */
     if (tipo=='R' || tipo=='I' || tipo=='V') {
       sscanf(p,"%10s%10s%lg",na,nb,&netlist[ne].valor);
-      printf("%s %s %s %g\n",netlist[ne].nome,na,nb,netlist[ne].valor);
+      cout << netlist[ne].nome << " " << na << " " << nb << " " << netlist[ne].valor << endl;
       netlist[ne].a=numero(na);
       netlist[ne].b=numero(nb);
     }
     else if (tipo=='G' || tipo=='E' || tipo=='F' || tipo=='H') {
       sscanf(p,"%10s%10s%10s%10s%lg",na,nb,nc,nd,&netlist[ne].valor);
-      printf("%s %s %s %s %s %g\n",netlist[ne].nome,na,nb,nc,nd,netlist[ne].valor);
+      cout << netlist[ne].nome << " " << na << " " << nb << " " << nc << " " << nd << " " << netlist[ne].valor << endl;
       netlist[ne].a=numero(na);
       netlist[ne].b=numero(nb);
       netlist[ne].c=numero(nc);
@@ -180,18 +189,18 @@ int main(void)
     }
     else if (tipo=='O') {
       sscanf(p,"%10s%10s%10s%10s",na,nb,nc,nd);
-      printf("%s %s %s %s %s\n",netlist[ne].nome,na,nb,nc,nd);
+      cout << netlist[ne].nome << " " << na << " " << nb << " " << nc << " " << nd << " " << endl;
       netlist[ne].a=numero(na);
       netlist[ne].b=numero(nb);
       netlist[ne].c=numero(nc);
       netlist[ne].d=numero(nd);
     }
     else if (tipo=='*') { /* Comentario comeca com "*" */
-      printf("Comentario: %s",txt);
+      cout << "Comentario: " << txt;
       ne--;
     }
     else {
-      printf("Elemento desconhecido: %s\n",txt);
+      cout << "Elemento desconhecido: " << txt << endl;
       getch();
       exit(1);
     }
@@ -204,7 +213,7 @@ int main(void)
     if (tipo=='V' || tipo=='E' || tipo=='F' || tipo=='O') {
       nv++;
       if (nv>MAX_NOS) {
-        printf("As correntes extra excederam o numero de variaveis permitido (%d)\n",MAX_NOS);
+        cout << "As correntes extra excederam o numero de variaveis permitido (" << MAX_NOS << ")" << endl;
         exit(1);
       }
       strcpy(lista[nv],"j"); /* Tem espaco para mais dois caracteres */
@@ -214,7 +223,7 @@ int main(void)
     else if (tipo=='H') {
       nv=nv+2;
       if (nv>MAX_NOS) {
-        printf("As correntes extra excederam o numero de variaveis permitido (%d)\n",MAX_NOS);
+        cout << "As correntes extra excederam o numero de variaveis permitido (" << MAX_NOS << ")" << endl;
         exit(1);
       }
       strcpy(lista[nv-1],"jx"); strcat(lista[nv-1],netlist[i].nome);
@@ -225,11 +234,11 @@ int main(void)
   }
   getch();
   /* Lista tudo */
-  printf("Variaveis internas: \n");
+  cout << "Variaveis internas: " << endl;
   for (i=0; i<=nv; i++)
-    printf("%d -> %s\n",i,lista[i]);
+    cout << i << " -> " << lista[i] << endl;
   getch();
-  printf("Netlist interno final\n");
+  cout << "Netlist interno final" << endl;
   for (i=1; i<=ne; i++) {
     tipo=netlist[i].nome[0];
     if (tipo=='R' || tipo=='I' || tipo=='V') {
@@ -339,21 +348,21 @@ int main(void)
   }
 #ifdef DEBUG
   /* Opcional: Mostra o sistema resolvido */
-  printf("Sistema resolvido:\n");
+  cout << "Sistema resolvido:" << endl;
   for (i=1; i<=nv; i++) {
       for (j=1; j<=nv+1; j++)
         if (Yn[i][j]!=0) printf("%+3.1f ",Yn[i][j]);
-        else printf(" ... ");
-      printf("\n");
+        else cout << " ... ";
+      cout << endl;
     }
   getch();
 #endif
   /* Mostra solucao */
-  printf("Solucao:\n");
+  cout << "Solucao:" << endl;
   strcpy(txt,"Tensao");
   for (i=1; i<=nv; i++) {
     if (i==nn+1) strcpy(txt,"Corrente");
-    printf("%s %s: %g\n",txt,lista[i],Yn[i][nv+1]);
+    cout << txt << " " << lista[i] << ": " << Yn[i][nv+1] << endl;
   }
   getch();
 }
