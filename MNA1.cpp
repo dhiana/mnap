@@ -242,22 +242,26 @@ int main(void)
   for (i=1; i<=ne; i++) {
     tipo=netlist[i].nome[0];
     if (tipo=='R' || tipo=='I' || tipo=='V') {
-      printf("%s %d %d %g\n",netlist[i].nome,netlist[i].a,netlist[i].b,netlist[i].valor);
+      cout << netlist[i].nome << " " << netlist[i].a << " " << netlist[i].b << " " << netlist[i].valor << endl;
     }
     else if (tipo=='G' || tipo=='E' || tipo=='F' || tipo=='H') {
-      printf("%s %d %d %d %d %g\n",netlist[i].nome,netlist[i].a,netlist[i].b,netlist[i].c,netlist[i].d,netlist[i].valor);
+      //printf("%s %d %d %d %d %g\n",netlist[i].nome,netlist[i].a,netlist[i].b,netlist[i].c,netlist[i].d,netlist[i].valor);
+      cout << netlist[i].nome << " " << netlist[i].a << " " << netlist[i].b << " "
+           << netlist[i].c << " " << netlist[i].d   << " " << netlist[i].valor << endl;
     }
     else if (tipo=='O') {
-      printf("%s %d %d %d %d\n",netlist[i].nome,netlist[i].a,netlist[i].b,netlist[i].c,netlist[i].d);
+      //printf("%s %d %d %d %d\n",netlist[i].nome,netlist[i].a,netlist[i].b,netlist[i].c,netlist[i].d);
+      cout << netlist[i].nome << " " << netlist[i].a << " " << netlist[i].b << " "
+           << netlist[i].c << " " << netlist[i].d   << endl;
     }
     if (tipo=='V' || tipo=='E' || tipo=='F' || tipo=='O')
-      printf("Corrente jx: %d\n",netlist[i].x);
+      cout << "Corrente jx: " << netlist[i].x << endl;
     else if (tipo=='H')
-      printf("Correntes jx e jy: %d, %d\n",netlist[i].x,netlist[i].y);
+      cout << "Correntes jx e jy: " << netlist[i].x << ", " << netlist[i].y << endl;
   }
   getch();
   /* Monta o sistema nodal modificado */
-  printf("O circuito tem %d nos, %d variaveis e %d elementos\n",nn,nv,ne);
+  cout << "O circuito tem " << nn << " nos, " << nv << " variaveis e " << ne << " elementos" << endl;
   getch();
   /* Zera sistema */
   for (i=0; i<=nv; i++) {
@@ -331,12 +335,12 @@ int main(void)
     }
 #ifdef DEBUG
     /* Opcional: Mostra o sistema apos a montagem da estampa */
-    printf("Sistema apos a estampa de %s\n",netlist[i].nome);
+    cout << "Sistema apos a estampa de " << netlist[i].nome << endl;
     for (k=1; k<=nv; k++) {
       for (j=1; j<=nv+1; j++)
         if (Yn[k][j]!=0) printf("%+3.1f ",Yn[k][j]);
-        else printf(" ... ");
-      printf("\n");
+        else cout << " ... ";
+      cout << endl;
     }
     getch();
 #endif
