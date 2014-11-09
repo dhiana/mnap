@@ -205,33 +205,33 @@ int main( void ){
         }
     }
     fclose( arquivo );
-  /* Acrescenta variaveis de corrente acima dos nos, anotando no netlist */
-  nn=nv;
-  for (i=1; i<=ne; i++) {
-    tipo=netlist[i].nome[0];
-    if (tipo=='V' || tipo=='E' || tipo=='F' || tipo=='O') {
-      nv++;
-      if (nv>MAX_NOS) {
-        cout << "As correntes extra excederam o numero de variaveis permitido (" << MAX_NOS << ")" << endl;
-        exit(1);
-      }
-      strcpy(lista[nv],"j"); /* Tem espaco para mais dois caracteres */
-      strcat(lista[nv],netlist[i].nome);
-      netlist[i].x=nv;
+    /* Acrescenta variaveis de corrente acima dos nos, anotando no netlist */
+    nn = nv;
+    for( i = 1; i <= ne; i++ ){
+        tipo = netlist[i].nome[0];
+        if( tipo == 'V' || tipo == 'E' || tipo == 'F' || tipo == 'O'){
+            nv++;
+            if( nv > MAX_NOS ){
+                cout << "As correntes extra excederam o numero de variaveis permitido (" << MAX_NOS << ")" << endl;
+                exit( 1 );
+            }
+            strcpy( lista[nv], "j" ); /* Tem espaco para mais dois caracteres */
+            strcat( lista[nv], netlist[i].nome );
+            netlist[i].x = nv;
+        }
+        else if( tipo == 'H' ){
+            nv = nv + 2;
+            if( nv > MAX_NOS){
+                cout << "As correntes extra excederam o numero de variaveis permitido (" << MAX_NOS << ")" << endl;
+                exit( 1 );
+            }
+            strcpy( lista[nv-1], "jx" ); strcat( lista[nv-1], netlist[i].nome );
+            netlist[i].x = nv-1;
+            strcpy( lista[nv], "jy" ); strcat( lista[nv], netlist[i].nome );
+            netlist[i].y = nv;
+        }
     }
-    else if (tipo=='H') {
-      nv=nv+2;
-      if (nv>MAX_NOS) {
-        cout << "As correntes extra excederam o numero de variaveis permitido (" << MAX_NOS << ")" << endl;
-        exit(1);
-      }
-      strcpy(lista[nv-1],"jx"); strcat(lista[nv-1],netlist[i].nome);
-      netlist[i].x=nv-1;
-      strcpy(lista[nv],"jy"); strcat(lista[nv],netlist[i].nome);
-      netlist[i].y=nv;
-    }
-  }
-  getch();
+    getch();
   /* Lista tudo */
   cout << "Variaveis internas: " << endl;
   for (i=0; i<=nv; i++)
