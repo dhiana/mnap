@@ -123,7 +123,7 @@ int numero( char *nome ){
 
     i = 0; achou = 0;
     while( !achou && i <= nv )
-        if ( !( achou = !strcmp( nome, lista[i] ) ) )
+        if( !( achou = !strcmp( nome, lista[i] ) ) )
             i++;
     if ( !achou ){
         if ( nv == MAX_NOS){
@@ -153,16 +153,23 @@ int main( void ){
     cout << "Por Antonio Carlos M. de Queiroz - acmq@coe.ufrj.br" << endl;
     cout << "Versao " << versao << endl;
 
-    denovo:
     /* Leitura do netlist */
-    ne = 0; nv = 0; strcpy( lista[0], "0" );
-    cout << "Nome do arquivo com o netlist (ex: mna.net): ";
-    cin >> nomearquivo;
-    arquivo = fopen( nomearquivo.c_str(), "r" );
-    if( arquivo == 0 ){
-        cout << "Arquivo " << nomearquivo << " inexistente" << endl;
-        goto denovo;
-    }
+
+    bool arquivovalido = false;
+    do{
+
+        ne = 0; nv = 0; strcpy( lista[0], "0" );
+        cout << "Nome do arquivo com o netlist (ex: mna.net): ";
+        cin >> nomearquivo;
+        arquivo = fopen( nomearquivo.c_str(), "r" );
+        if( arquivo == 0 ){
+            cout << "Arquivo " << nomearquivo << " inexistente" << endl;
+            continue;
+        }
+        arquivovalido = true;
+
+    }while( !arquivovalido );
+
     cout << "Lendo netlist:" << endl;
     fgets( txt, MAX_LINHA, arquivo );
     cout << "Titulo: " << txt;
