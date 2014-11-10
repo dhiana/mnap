@@ -34,6 +34,7 @@ Os nos podem ser nomes
 
 #include <iomanip>
 #include <iostream>
+#include <string>
 
 using namespace std;
 
@@ -66,12 +67,12 @@ int
 char
 /* Foram colocados limites nos formatos de leitura para alguma protecao
    contra excesso de caracteres nestas variaveis */
-    nomearquivo[MAX_LINHA+1],
     tipo,
     na[MAX_NOME], nb[MAX_NOME], nc[MAX_NOME], nd[MAX_NOME],
     lista[MAX_NOS+1][MAX_NOME+2], /*Tem que caber jx antes do nome */
     txt[MAX_LINHA+1],
     *p;
+
 FILE *arquivo;
 
 double
@@ -139,20 +140,25 @@ int numero( char *nome ){
 }
 
 int main( void ){
+
+    string nomearquivo;
+
     #if defined(WIN32) || defined(_WIN32)
     system( "cls" );
     #else
     system( "clear" );
     #endif
+
     cout << "Programa demonstrativo de analise nodal modificada" << endl;
     cout << "Por Antonio Carlos M. de Queiroz - acmq@coe.ufrj.br" << endl;
     cout << "Versao " << versao << endl;
+
     denovo:
     /* Leitura do netlist */
     ne = 0; nv = 0; strcpy( lista[0], "0" );
     cout << "Nome do arquivo com o netlist (ex: mna.net): ";
-    scanf( "%50s", nomearquivo );
-    arquivo = fopen( nomearquivo, "r" );
+    cin >> nomearquivo;
+    arquivo = fopen( nomearquivo.c_str(), "r" );
     if( arquivo == 0 ){
         cout << "Arquivo " << nomearquivo << " inexistente" << endl;
         goto denovo;
