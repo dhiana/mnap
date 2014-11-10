@@ -40,7 +40,7 @@ using namespace std;
 
 #include <conio.h>
 #include <string.h>
-#include <stdlib.h>
+//#include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
 #define MAX_LINHA 80
@@ -57,12 +57,6 @@ typedef struct elemento{ /* Elemento do netlist */
 } elemento;
 
 elemento netlist[MAX_ELEM]; /* Netlist */
-
-int
-    ne, /* Elementos */
-    nv, /* Variaveis */
-    nn, /* Nos */
-    i, j, k;
 
 char
 /* Foram colocados limites nos formatos de leitura para alguma protecao
@@ -81,7 +75,7 @@ double
 
 /* Resolucao de sistema de equacoes lineares.
    Metodo de Gauss-Jordan com condensacao pivotal */
-int resolversistema( void ){
+int resolversistema( int &nv ){
     int i, j, l, a;
     double t, p;
 
@@ -118,7 +112,7 @@ int resolversistema( void ){
 }
 
 /* Rotina que conta os nos e atribui numeros a eles */
-int numero( char *nome ){
+int numero( char *nome, int &nv ){
     int i, achou;
 
     i = 0; achou = 0;
@@ -140,6 +134,12 @@ int numero( char *nome ){
 }
 
 int main( void ){
+
+    int
+        ne, /* Elementos */
+        nv, /* Variaveis */
+        nn, /* Nos */
+        i, j, k;
 
     string nomearquivo;
 
@@ -187,25 +187,25 @@ int main( void ){
         if( tipo == 'R' || tipo == 'I' || tipo == 'V' ){
             sscanf( p, "%10s%10s%lg", na, nb, &netlist[ne].valor );
             cout << netlist[ne].nome << " " << na << " " << nb << " " << netlist[ne].valor << endl;
-            netlist[ne].a = numero( na );
-            netlist[ne].b = numero( nb );
+            netlist[ne].a = numero( na, nv );
+            netlist[ne].b = numero( nb, nv );
         }
         else if( tipo == 'G' || tipo == 'E' || tipo == 'F' || tipo == 'H'){
             sscanf( p, "%10s%10s%10s%10s%lg", na, nb, nc, nd, &netlist[ne].valor );
             cout << netlist[ne].nome << " " << na << " " << nb << " " << nc << " "
                  << nd << " "<< netlist[ne].valor << endl;
-            netlist[ne].a = numero( na );
-            netlist[ne].b = numero( nb );
-            netlist[ne].c = numero( nc );
-            netlist[ne].d = numero( nd );
+            netlist[ne].a = numero( na, nv );
+            netlist[ne].b = numero( nb, nv );
+            netlist[ne].c = numero( nc, nv );
+            netlist[ne].d = numero( nd, nv );
         }
         else if( tipo == 'O' ){
             sscanf( p, "%10s%10s%10s%10s", na, nb, nc, nd );
             cout << netlist[ne].nome << " " << na << " " << nb << " " << nc << " " << nd << " " << endl;
-            netlist[ne].a = numero( na );
-            netlist[ne].b = numero( nb );
-            netlist[ne].c = numero( nc );
-            netlist[ne].d = numero( nd );
+            netlist[ne].a = numero( na, nv );
+            netlist[ne].b = numero( nb, nv );
+            netlist[ne].c = numero( nc, nv );
+            netlist[ne].d = numero( nd, nv );
         }
         else if( tipo == '*' ){ /* Comentario comeca com "*" */
             cout << "Comentario: " << txt;
@@ -360,7 +360,7 @@ int main( void ){
 #endif
     }
     /* Resolve o sistema */
-    if( resolversistema() ){
+    if( resolversistema( nv ) ){
         getch();
         exit;
     }
