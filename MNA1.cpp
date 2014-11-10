@@ -69,13 +69,9 @@ char
 
 FILE *arquivo;
 
-double
-    g,
-    Yn[MAX_NOS+1][MAX_NOS+2];
-
 /* Resolucao de sistema de equacoes lineares.
    Metodo de Gauss-Jordan com condensacao pivotal */
-int resolversistema( int &nv ){
+int resolversistema( int &nv, double Yn[MAX_NOS+1][MAX_NOS+2] ){
     int i, j, l, a;
     double t, p;
 
@@ -140,6 +136,9 @@ int main( void ){
         nv, /* Variaveis */
         nn, /* Nos */
         i, j, k;
+    double
+        g,
+        Yn[MAX_NOS+1][MAX_NOS+2];
 
     string nomearquivo;
 
@@ -360,7 +359,7 @@ int main( void ){
 #endif
     }
     /* Resolve o sistema */
-    if( resolversistema( nv ) ){
+    if( resolversistema( nv, Yn ) ){
         getch();
         exit;
     }
