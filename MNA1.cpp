@@ -32,11 +32,11 @@ Os nos podem ser nomes
 
 #define versao "1.0i - 03/11/2013"
 
+#include <iomanip>
 #include <iostream>
 
 using namespace std;
 
-#include <stdio.h>
 #include <conio.h>
 #include <string.h>
 #include <stdlib.h>
@@ -335,7 +335,10 @@ int main( void ){
     cout << "Sistema apos a estampa de " << netlist[i].nome << endl;
     for (k=1; k<=nv; k++) {
       for (j=1; j<=nv+1; j++)
-        if (Yn[k][j]!=0) printf("%+3.1f ",Yn[k][j]);
+        if (Yn[k][j]!=0){
+            cout << setprecision( 1 ) << fixed << setw( 3 ) << showpos;
+            cout << Yn[k][j] << " ";
+        }
         else cout << " ... ";
       cout << endl;
     }
@@ -352,7 +355,10 @@ int main( void ){
   cout << "Sistema resolvido:" << endl;
   for (i=1; i<=nv; i++) {
       for (j=1; j<=nv+1; j++)
-        if (Yn[i][j]!=0) printf("%+3.1f ",Yn[i][j]);
+        if (Yn[i][j]!=0){
+            cout << setprecision( 1 ) << fixed << setw( 3 ) << showpos;
+            cout << Yn[i][j] << " ";
+        }
         else cout << " ... ";
       cout << endl;
     }
