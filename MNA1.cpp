@@ -232,145 +232,148 @@ int main( void ){
         }
     }
     getch();
-  /* Lista tudo */
-  cout << "Variaveis internas: " << endl;
-  for (i=0; i<=nv; i++)
-    cout << i << " -> " << lista[i] << endl;
-  getch();
-  cout << "Netlist interno final" << endl;
-  for (i=1; i<=ne; i++) {
-    tipo=netlist[i].nome[0];
-    if (tipo=='R' || tipo=='I' || tipo=='V') {
-      cout << netlist[i].nome << " " << netlist[i].a << " " << netlist[i].b << " " << netlist[i].valor << endl;
+    /* Lista tudo */
+    cout << "Variaveis internas: " << endl;
+    for( i = 0; i <= nv; i++ )
+        cout << i << " -> " << lista[i] << endl;
+    getch();
+    cout << "Netlist interno final" << endl;
+    for( i = 1; i <= ne; i++ ){
+        tipo=netlist[i].nome[0];
+        if( tipo == 'R' || tipo == 'I' || tipo == 'V' ){
+            cout << netlist[i].nome << " " << netlist[i].a << " " << netlist[i].b << " " << netlist[i].valor << endl;
+        }
+        else if( tipo == 'G' || tipo == 'E' || tipo == 'F' || tipo == 'H' ){
+            cout << netlist[i].nome << " " << netlist[i].a << " " << netlist[i].b << " "
+                 << netlist[i].c << " " << netlist[i].d   << " " << netlist[i].valor << endl;
+        }
+        else if( tipo == 'O' ){
+            cout << netlist[i].nome << " " << netlist[i].a << " " << netlist[i].b << " "
+                 << netlist[i].c << " " << netlist[i].d   << endl;
+        }
+        if( tipo == 'V' || tipo == 'E' || tipo == 'F' || tipo == 'O' )
+            cout << "Corrente jx: " << netlist[i].x << endl;
+        else if( tipo == 'H' )
+            cout << "Correntes jx e jy: " << netlist[i].x << ", " << netlist[i].y << endl;
     }
-    else if (tipo=='G' || tipo=='E' || tipo=='F' || tipo=='H') {
-      cout << netlist[i].nome << " " << netlist[i].a << " " << netlist[i].b << " "
-           << netlist[i].c << " " << netlist[i].d   << " " << netlist[i].valor << endl;
+    getch();
+    /* Monta o sistema nodal modificado */
+    cout << "O circuito tem " << nn << " nos, " << nv << " variaveis e " << ne << " elementos" << endl;
+    getch();
+    /* Zera sistema */
+    for( i = 0; i <= nv; i++ ){
+        for( j = 0; j <= nv + 1; j++ )
+            Yn[i][j]=0;
     }
-    else if (tipo=='O') {
-      cout << netlist[i].nome << " " << netlist[i].a << " " << netlist[i].b << " "
-           << netlist[i].c << " " << netlist[i].d   << endl;
+    /* Monta estampas */
+    for( i = 1; i <= ne; i++ ){
+        tipo = netlist[i].nome[0];
+        if( tipo == 'R' ){
+            g = 1 / netlist[i].valor;
+            Yn[netlist[i].a][netlist[i].a] += g;
+            Yn[netlist[i].b][netlist[i].b] += g;
+            Yn[netlist[i].a][netlist[i].b] -= g;
+            Yn[netlist[i].b][netlist[i].a] -= g;
+        }
+        else if( tipo == 'G' ){
+            g = netlist[i].valor;
+            Yn[netlist[i].a][netlist[i].c] += g;
+            Yn[netlist[i].b][netlist[i].d] += g;
+            Yn[netlist[i].a][netlist[i].d] -= g;
+            Yn[netlist[i].b][netlist[i].c] -= g;
+        }
+        else if( tipo == 'I' ){
+            g = netlist[i].valor;
+            Yn[netlist[i].a][nv+1] -= g;
+            Yn[netlist[i].b][nv+1] += g;
+        }
+        else if( tipo == 'V' ){
+            Yn[netlist[i].a][netlist[i].x]+=1;
+            Yn[netlist[i].b][netlist[i].x]-=1;
+            Yn[netlist[i].x][netlist[i].a]-=1;
+            Yn[netlist[i].x][netlist[i].b]+=1;
+            Yn[netlist[i].x][nv+1]-=netlist[i].valor;
+        }
+        else if( tipo == 'E' ){
+            g = netlist[i].valor;
+            Yn[netlist[i].a][netlist[i].x] += 1;
+            Yn[netlist[i].b][netlist[i].x] -= 1;
+            Yn[netlist[i].x][netlist[i].a] -= 1;
+            Yn[netlist[i].x][netlist[i].b] += 1;
+            Yn[netlist[i].x][netlist[i].c] += g;
+            Yn[netlist[i].x][netlist[i].d] -= g;
+        }
+        else if( tipo == 'F' ){
+            g = netlist[i].valor;
+            Yn[netlist[i].a][netlist[i].x] += g;
+            Yn[netlist[i].b][netlist[i].x] -= g;
+            Yn[netlist[i].c][netlist[i].x] += 1;
+            Yn[netlist[i].d][netlist[i].x] -= 1;
+            Yn[netlist[i].x][netlist[i].c] -= 1;
+            Yn[netlist[i].x][netlist[i].d] += 1;
+        }
+        else if( tipo == 'H' ){
+            g = netlist[i].valor;
+            Yn[netlist[i].a][netlist[i].y] += 1;
+            Yn[netlist[i].b][netlist[i].y] -= 1;
+            Yn[netlist[i].c][netlist[i].x] += 1;
+            Yn[netlist[i].d][netlist[i].x] -= 1;
+            Yn[netlist[i].y][netlist[i].a] -= 1;
+            Yn[netlist[i].y][netlist[i].b] += 1;
+            Yn[netlist[i].x][netlist[i].c] -= 1;
+            Yn[netlist[i].x][netlist[i].d] += 1;
+            Yn[netlist[i].y][netlist[i].x] += g;
+        }
+        else if( tipo == 'O' ){
+            Yn[netlist[i].a][netlist[i].x] += 1;
+            Yn[netlist[i].b][netlist[i].x] -= 1;
+            Yn[netlist[i].x][netlist[i].c] += 1;
+            Yn[netlist[i].x][netlist[i].d] -= 1 ;
+        }
+#ifdef DEBUG
+        /* Opcional: Mostra o sistema apos a montagem da estampa */
+        cout << "Sistema apos a estampa de " << netlist[i].nome << endl;
+        for (k=1; k<=nv; k++) {
+            for (j=1; j<=nv+1; j++){
+                if (Yn[k][j]!=0){
+                    cout << setprecision( 1 ) << fixed << setw( 3 ) << showpos;
+                    cout << Yn[k][j] << " ";
+                }
+                else cout << " ... ";
+            }
+            cout << endl;
+        }
+        getch();
+#endif
     }
-    if (tipo=='V' || tipo=='E' || tipo=='F' || tipo=='O')
-      cout << "Corrente jx: " << netlist[i].x << endl;
-    else if (tipo=='H')
-      cout << "Correntes jx e jy: " << netlist[i].x << ", " << netlist[i].y << endl;
-  }
-  getch();
-  /* Monta o sistema nodal modificado */
-  cout << "O circuito tem " << nn << " nos, " << nv << " variaveis e " << ne << " elementos" << endl;
-  getch();
-  /* Zera sistema */
-  for (i=0; i<=nv; i++) {
-    for (j=0; j<=nv+1; j++)
-      Yn[i][j]=0;
-  }
-  /* Monta estampas */
-  for (i=1; i<=ne; i++) {
-    tipo=netlist[i].nome[0];
-    if (tipo=='R') {
-      g=1/netlist[i].valor;
-      Yn[netlist[i].a][netlist[i].a]+=g;
-      Yn[netlist[i].b][netlist[i].b]+=g;
-      Yn[netlist[i].a][netlist[i].b]-=g;
-      Yn[netlist[i].b][netlist[i].a]-=g;
-    }
-    else if (tipo=='G') {
-      g=netlist[i].valor;
-      Yn[netlist[i].a][netlist[i].c]+=g;
-      Yn[netlist[i].b][netlist[i].d]+=g;
-      Yn[netlist[i].a][netlist[i].d]-=g;
-      Yn[netlist[i].b][netlist[i].c]-=g;
-    }
-    else if (tipo=='I') {
-      g=netlist[i].valor;
-      Yn[netlist[i].a][nv+1]-=g;
-      Yn[netlist[i].b][nv+1]+=g;
-    }
-    else if (tipo=='V') {
-      Yn[netlist[i].a][netlist[i].x]+=1;
-      Yn[netlist[i].b][netlist[i].x]-=1;
-      Yn[netlist[i].x][netlist[i].a]-=1;
-      Yn[netlist[i].x][netlist[i].b]+=1;
-      Yn[netlist[i].x][nv+1]-=netlist[i].valor;
-    }
-    else if (tipo=='E') {
-      g=netlist[i].valor;
-      Yn[netlist[i].a][netlist[i].x]+=1;
-      Yn[netlist[i].b][netlist[i].x]-=1;
-      Yn[netlist[i].x][netlist[i].a]-=1;
-      Yn[netlist[i].x][netlist[i].b]+=1;
-      Yn[netlist[i].x][netlist[i].c]+=g;
-      Yn[netlist[i].x][netlist[i].d]-=g;
-    }
-    else if (tipo=='F') {
-      g=netlist[i].valor;
-      Yn[netlist[i].a][netlist[i].x]+=g;
-      Yn[netlist[i].b][netlist[i].x]-=g;
-      Yn[netlist[i].c][netlist[i].x]+=1;
-      Yn[netlist[i].d][netlist[i].x]-=1;
-      Yn[netlist[i].x][netlist[i].c]-=1;
-      Yn[netlist[i].x][netlist[i].d]+=1;
-    }
-    else if (tipo=='H') {
-      g=netlist[i].valor;
-      Yn[netlist[i].a][netlist[i].y]+=1;
-      Yn[netlist[i].b][netlist[i].y]-=1;
-      Yn[netlist[i].c][netlist[i].x]+=1;
-      Yn[netlist[i].d][netlist[i].x]-=1;
-      Yn[netlist[i].y][netlist[i].a]-=1;
-      Yn[netlist[i].y][netlist[i].b]+=1;
-      Yn[netlist[i].x][netlist[i].c]-=1;
-      Yn[netlist[i].x][netlist[i].d]+=1;
-      Yn[netlist[i].y][netlist[i].x]+=g;
-    }
-    else if (tipo=='O') {
-      Yn[netlist[i].a][netlist[i].x]+=1;
-      Yn[netlist[i].b][netlist[i].x]-=1;
-      Yn[netlist[i].x][netlist[i].c]+=1;
-      Yn[netlist[i].x][netlist[i].d]-=1;
+    /* Resolve o sistema */
+    if( resolversistema() ){
+        getch();
+        exit;
     }
 #ifdef DEBUG
-    /* Opcional: Mostra o sistema apos a montagem da estampa */
-    cout << "Sistema apos a estampa de " << netlist[i].nome << endl;
-    for (k=1; k<=nv; k++) {
-      for (j=1; j<=nv+1; j++)
-        if (Yn[k][j]!=0){
-            cout << setprecision( 1 ) << fixed << setw( 3 ) << showpos;
-            cout << Yn[k][j] << " ";
+    /* Opcional: Mostra o sistema resolvido */
+    cout << "Sistema resolvido:" << endl;
+    for (i=1; i<=nv; i++) {
+        for (j=1; j<=nv+1; j++){
+            if (Yn[i][j]!=0){
+                cout << setprecision( 1 ) << fixed << setw( 3 ) << showpos;
+                cout << Yn[i][j] << " ";
+            }
+            else cout << " ... ";
         }
-        else cout << " ... ";
       cout << endl;
     }
     getch();
 #endif
-  }
-  /* Resolve o sistema */
-  if (resolversistema()) {
-    getch();
-    exit;
-  }
-#ifdef DEBUG
-  /* Opcional: Mostra o sistema resolvido */
-  cout << "Sistema resolvido:" << endl;
-  for (i=1; i<=nv; i++) {
-      for (j=1; j<=nv+1; j++)
-        if (Yn[i][j]!=0){
-            cout << setprecision( 1 ) << fixed << setw( 3 ) << showpos;
-            cout << Yn[i][j] << " ";
-        }
-        else cout << " ... ";
-      cout << endl;
+    /* Mostra solucao */
+    cout << "Solucao:" << endl;
+    strcpy( txt, "Tensao" );
+    for( i = 1; i <= nv; i++ ){
+        if( i == nn + 1 )
+            strcpy( txt, "Corrente" );
+        cout << txt << " " << lista[i] << ": " << Yn[i][nv+1] << endl;
     }
-  getch();
-#endif
-  /* Mostra solucao */
-  cout << "Solucao:" << endl;
-  strcpy(txt,"Tensao");
-  for (i=1; i<=nv; i++) {
-    if (i==nn+1) strcpy(txt,"Corrente");
-    cout << txt << " " << lista[i] << ": " << Yn[i][nv+1] << endl;
-  }
-  getch();
+    getch();
 }
 
