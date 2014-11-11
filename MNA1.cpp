@@ -38,9 +38,7 @@ Os nos podem ser nomes
 
 using namespace std;
 
-#include <conio.h>
 #include <string.h>
-//#include <stdlib.h>
 #include <ctype.h>
 #include <math.h>
 #define MAX_LINHA 80
@@ -213,7 +211,7 @@ int main( void ){
         }
         else{
             cout << "Elemento desconhecido: " << txt << endl;
-            getch();
+            cin.get();
             exit( 1 );
         }
     }
@@ -244,12 +242,13 @@ int main( void ){
             netlist[i].y = nv;
         }
     }
-    getch();
+    fflush( stdin );
+    cin.get();
     /* Lista tudo */
     cout << "Variaveis internas: " << endl;
     for( i = 0; i <= nv; i++ )
         cout << i << " -> " << lista[i] << endl;
-    getch();
+    cin.get();
     cout << "Netlist interno final" << endl;
     for( i = 1; i <= ne; i++ ){
         tipo=netlist[i].nome[0];
@@ -269,10 +268,10 @@ int main( void ){
         else if( tipo == 'H' )
             cout << "Correntes jx e jy: " << netlist[i].x << ", " << netlist[i].y << endl;
     }
-    getch();
+    cin.get();
     /* Monta o sistema nodal modificado */
     cout << "O circuito tem " << nn << " nos, " << nv << " variaveis e " << ne << " elementos" << endl;
-    getch();
+    cin.get();
     /* Zera sistema */
     for( i = 0; i <= nv; i++ ){
         for( j = 0; j <= nv + 1; j++ )
@@ -356,12 +355,12 @@ int main( void ){
             }
             cout << endl;
         }
-        getch();
+        cin.get();
 #endif
     }
     /* Resolve o sistema */
     if( resolversistema( nv, Yn ) ){
-        getch();
+        cin.get();
         exit( 0 );
     }
 #ifdef DEBUG
@@ -377,7 +376,7 @@ int main( void ){
         }
       cout << endl;
     }
-    getch();
+    cin.get();
 #endif
     /* Mostra solucao */
     cout << "Solucao:" << endl;
@@ -387,6 +386,6 @@ int main( void ){
             strcpy( txt, "Corrente" );
         cout << txt << " " << lista[i] << ": " << Yn[i][nv+1] << endl;
     }
-    getch();
+    cin.get();
 }
 
