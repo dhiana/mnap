@@ -56,19 +56,6 @@ typedef struct elemento{ /* Elemento do netlist */
     int a, b, c, d, x, y;
 } elemento;
 
-elemento netlist[MAX_ELEM]; /* Netlist */
-
-char
-/* Foram colocados limites nos formatos de leitura para alguma protecao
-   contra excesso de caracteres nestas variaveis */
-    tipo,
-    na[MAX_NOME], nb[MAX_NOME], nc[MAX_NOME], nd[MAX_NOME],
-    lista[MAX_NOS+1][MAX_NOME+2], /*Tem que caber jx antes do nome */
-    txt[MAX_LINHA+1],
-    *p;
-
-FILE *arquivo;
-
 /* Resolucao de sistema de equacoes lineares.
    Metodo de Gauss-Jordan com condensacao pivotal */
 int resolversistema( int &nv, double Yn[MAX_NOS+1][MAX_NOS+2] ){
@@ -108,7 +95,7 @@ int resolversistema( int &nv, double Yn[MAX_NOS+1][MAX_NOS+2] ){
 }
 
 /* Rotina que conta os nos e atribui numeros a eles */
-int numero( char *nome, int &nv ){
+int numero( const char *nome, int &nv, char lista[MAX_NOS+1][MAX_NOME+2] ){
     int i, achou;
 
     i = 0; achou = 0;
@@ -131,11 +118,25 @@ int numero( char *nome, int &nv ){
 
 int main( void ){
 
+    FILE *arquivo;
+    elemento netlist[MAX_ELEM]; /* Netlist */
+
     int
         ne, /* Elementos */
         nv, /* Variaveis */
         nn, /* Nos */
         i, j, k;
+
+    char
+    /* Foram colocados limites nos formatos de leitura para alguma protecao
+       contra excesso de caracteres nestas variaveis */
+        tipo,
+        lista[MAX_NOS+1][MAX_NOME+2], /*Tem que caber jx antes do nome */
+        txt[MAX_LINHA+1],
+        *p;
+
+    char na[MAX_NOME], nb[MAX_NOME], nc[MAX_NOME], nd[MAX_NOME];
+
     double
         g,
         Yn[MAX_NOS+1][MAX_NOS+2];
@@ -186,25 +187,25 @@ int main( void ){
         if( tipo == 'R' || tipo == 'I' || tipo == 'V' ){
             sscanf( p, "%10s%10s%lg", na, nb, &netlist[ne].valor );
             cout << netlist[ne].nome << " " << na << " " << nb << " " << netlist[ne].valor << endl;
-            netlist[ne].a = numero( na, nv );
-            netlist[ne].b = numero( nb, nv );
+            netlist[ne].a = numero( na, nv, lista );
+            netlist[ne].b = numero( nb, nv, lista );
         }
         else if( tipo == 'G' || tipo == 'E' || tipo == 'F' || tipo == 'H'){
             sscanf( p, "%10s%10s%10s%10s%lg", na, nb, nc, nd, &netlist[ne].valor );
             cout << netlist[ne].nome << " " << na << " " << nb << " " << nc << " "
                  << nd << " "<< netlist[ne].valor << endl;
-            netlist[ne].a = numero( na, nv );
-            netlist[ne].b = numero( nb, nv );
-            netlist[ne].c = numero( nc, nv );
-            netlist[ne].d = numero( nd, nv );
+            netlist[ne].a = numero( na, nv, lista );
+            netlist[ne].b = numero( nb, nv, lista );
+            netlist[ne].c = numero( nc, nv, lista );
+            netlist[ne].d = numero( nd, nv, lista );
         }
         else if( tipo == 'O' ){
             sscanf( p, "%10s%10s%10s%10s", na, nb, nc, nd );
             cout << netlist[ne].nome << " " << na << " " << nb << " " << nc << " " << nd << " " << endl;
-            netlist[ne].a = numero( na, nv );
-            netlist[ne].b = numero( nb, nv );
-            netlist[ne].c = numero( nc, nv );
-            netlist[ne].d = numero( nd, nv );
+            netlist[ne].a = numero( na, nv, lista );
+            netlist[ne].b = numero( nb, nv, lista );
+            netlist[ne].c = numero( nc, nv, lista );
+            netlist[ne].d = numero( nd, nv, lista );
         }
         else if( tipo == '*' ){ /* Comentario comeca com "*" */
             cout << "Comentario: " << txt;
@@ -361,7 +362,7 @@ int main( void ){
     /* Resolve o sistema */
     if( resolversistema( nv, Yn ) ){
         getch();
-        exit;
+        exit( 0 );
     }
 #ifdef DEBUG
     /* Opcional: Mostra o sistema resolvido */
