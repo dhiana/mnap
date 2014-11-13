@@ -36,6 +36,7 @@ Os nos podem ser nomes
 #include <fstream>
 #include <iomanip>
 #include <iostream>
+#include <sstream>
 #include <string>
 #include <vector>
 
@@ -184,17 +185,22 @@ int main( void ){
         }
         txt[0] = toupper( txt[0] );
         tipo = txt[0];
-        sscanf( txt, "%10s", netlist[ne].nome );
+        //sscanf( txt, "%10s", netlist[ne].nome );
+        stringstream txtstream( txt );
+        txtstream >> netlist[ne].nome;
         p = txt + strlen( netlist[ne].nome ); /* Inicio dos parametros */
+        txtstream.str( p );
         /* O que e lido depende do tipo */
         if( tipo == 'R' || tipo == 'I' || tipo == 'V' ){
-            sscanf( p, "%10s%10s%lg", na, nb, &netlist[ne].valor );
+            //sscanf( p, "%10s%10s%lg", na, nb, &netlist[ne].valor );
+            txtstream >> na >> nb >> netlist[ne].valor;
             cout << netlist[ne].nome << " " << na << " " << nb << " " << netlist[ne].valor << endl;
             netlist[ne].a = numero( na, nv, lista );
             netlist[ne].b = numero( nb, nv, lista );
         }
         else if( tipo == 'G' || tipo == 'E' || tipo == 'F' || tipo == 'H'){
-            sscanf( p, "%10s%10s%10s%10s%lg", na, nb, nc, nd, &netlist[ne].valor );
+            //sscanf( p, "%10s%10s%10s%10s%lg", na, nb, nc, nd, &netlist[ne].valor );
+            txtstream >> na >> nb >> nc >> nd >> netlist[ne].valor;
             cout << netlist[ne].nome << " " << na << " " << nb << " " << nc << " "
                  << nd << " "<< netlist[ne].valor << endl;
             netlist[ne].a = numero( na, nv, lista );
@@ -203,7 +209,8 @@ int main( void ){
             netlist[ne].d = numero( nd, nv, lista );
         }
         else if( tipo == 'O' ){
-            sscanf( p, "%10s%10s%10s%10s", na, nb, nc, nd );
+            //sscanf( p, "%10s%10s%10s%10s", na, nb, nc, nd );
+            txtstream >> na >> nb >> nc >> nd;
             cout << netlist[ne].nome << " " << na << " " << nb << " " << nc << " " << nd << " " << endl;
             netlist[ne].a = numero( na, nv, lista );
             netlist[ne].b = numero( nb, nv, lista );
