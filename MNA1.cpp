@@ -32,15 +32,17 @@ Os nos podem ser nomes
 
 #define versao "1.0i - 03/11/2013"
 
+#include <cmath>
+#include <fstream>
 #include <iomanip>
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
 #include <string.h>
 #include <ctype.h>
-#include <math.h>
 
 #define TOLG 1e-9
 #define DEBUG
@@ -118,8 +120,8 @@ int numero( const char *nome, int &nv, char lista[MAX_NOS+1][MAX_NOME+2] ){
 
 int main( void ){
 
-    FILE *arquivo;
-    elemento netlist[MAX_ELEM]; /* Netlist */
+    ifstream arquivo;
+    vector< elemento > netlist( MAX_ELEM );
 
     int
         ne, /* Elementos */
@@ -143,7 +145,7 @@ int main( void ){
 
     string nomearquivo;
 
-    #if defined(WIN32) || defined(_WIN32)
+    #if defined (WIN32) || defined(_WIN32)
     system( "cls" );
     #else
     system( "clear" );
@@ -157,23 +159,24 @@ int main( void ){
 
     bool arquivovalido = false;
     do{
-
-        ne = 0; nv = 0; strcpy( lista[0], "0" );
+        ne = 0;
+        nv = 0;
+        strcpy( lista[0], "0" );
         cout << "Nome do arquivo com o netlist (ex: mna.net): ";
         cin >> nomearquivo;
-        arquivo = fopen( nomearquivo.c_str(), "r" );
-        if( arquivo == 0 ){
+        arquivo.open( nomearquivo, ifstream::in );
+        if( !arquivo.is_open() ){
             cout << "Arquivo " << nomearquivo << " inexistente" << endl;
             continue;
         }
         arquivovalido = true;
-
     }while( !arquivovalido );
 
     cout << "Lendo netlist:" << endl;
-    fgets( txt, MAX_LINHA, arquivo );
+    arquivo.getline( txt, MAX_LINHA );
     cout << "Titulo: " << txt;
-    while( fgets( txt, MAX_LINHA, arquivo ) ){
+    while( arquivo.good() ){
+        arquivo.getline( txt, MAX_LINHA );
         ne++; /* Nao usa o netlist[0] */
         if ( ne > MAX_ELEM ){
             cout << "O programa so aceita ate " << MAX_ELEM << " elementos" << endl;
@@ -217,7 +220,9 @@ int main( void ){
             exit( 1 );
         }
     }
-    fclose( arquivo );
+    //fclose( arquivo );
+    arquivo.close();
+
     /* Acrescenta variaveis de corrente acima dos nos, anotando no netlist */
     nn = nv;
     for( i = 1; i <= ne; i++ ){
@@ -279,6 +284,7 @@ int main( void ){
         for( j = 0; j <= nv + 1; j++ )
             Yn[i][j]=0;
     }
+
     /* Monta estampas */
     for( i = 1; i <= ne; i++ ){
         tipo = netlist[i].nome[0];
@@ -360,6 +366,7 @@ int main( void ){
         cin.get();
 #endif
     }
+
     /* Resolve o sistema */
     if( resolversistema( nv, Yn ) ){
         cin.get();
