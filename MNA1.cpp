@@ -54,7 +54,7 @@ static const int MAX_NOS = 50;
 
 /* Resolucao de sistema de equacoes lineares.
    Metodo de Gauss-Jordan com condensacao pivotal */
-int resolversistema( int &nv, double Yn[MAX_NOS+1][MAX_NOS+2] ){
+inline int resolversistema( int &nv, double Yn[MAX_NOS+1][MAX_NOS+2] ){
     int i, j, l, a;
     double t, p;
 
@@ -91,7 +91,7 @@ int resolversistema( int &nv, double Yn[MAX_NOS+1][MAX_NOS+2] ){
 }
 
 /* Rotina que conta os nos e atribui numeros a eles */
-int numero( const char *nome, int &nv, vector< string > &lista ){
+inline int numero( const char *nome, int &nv, vector< string > &lista ){
     int i, achou;
 
     i = 0; achou = 0;
