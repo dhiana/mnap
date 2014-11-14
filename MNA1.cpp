@@ -32,6 +32,8 @@ Os nos podem ser nomes
 
 #define versao "1.0i - 03/11/2013"
 
+#include "elemento.h"
+
 #include <cmath>
 #include <fstream>
 #include <iomanip>
@@ -49,13 +51,6 @@ static const int MAX_LINHA = 80;
 static const int MAX_NOME = 11;
 static const int MAX_ELEM = 50;
 static const int MAX_NOS = 50;
-
-//TODO: transformar elemento em classe
-typedef struct elemento{ /* Elemento do netlist */
-    string nome;
-    double valor;
-    int a, b, c, d, x, y;
-} elemento;
 
 /* Resolucao de sistema de equacoes lineares.
    Metodo de Gauss-Jordan com condensacao pivotal */
@@ -120,7 +115,7 @@ int numero( const char *nome, int &nv, vector< string > &lista ){
 int main( void ){
 
     ifstream arquivo;
-    vector< elemento > netlist( MAX_ELEM );
+    vector< Elemento > netlist( MAX_ELEM );
     vector< string > lista( MAX_NOME + 2 ); /*Tem que caber jx antes do nome */
     string txt;
 
