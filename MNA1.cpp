@@ -42,9 +42,6 @@ Os nos podem ser nomes
 
 using namespace std;
 
-#include <string.h>
-#include <ctype.h>
-
 #define TOLG 1e-9
 #define DEBUG
 
@@ -53,6 +50,7 @@ static const int MAX_NOME = 11;
 static const int MAX_ELEM = 50;
 static const int MAX_NOS = 50;
 
+//TODO: transformar elemento em classe
 typedef struct elemento{ /* Elemento do netlist */
     string nome;
     double valor;
@@ -69,7 +67,7 @@ int resolversistema( int &nv, double Yn[MAX_NOS+1][MAX_NOS+2] ){
         t = 0.0;
         a = i;
         for( l = i; l <= nv; l++ ){
-            if( fabs( Yn[l][i] ) > fabs( t ) ) {
+            if( fabs( Yn[l][i] ) > fabs( t ) ){
                 a = l;
                 t = Yn[l][i];
             }
@@ -98,12 +96,12 @@ int resolversistema( int &nv, double Yn[MAX_NOS+1][MAX_NOS+2] ){
 }
 
 /* Rotina que conta os nos e atribui numeros a eles */
-int numero( const char *nome, int &nv, char lista[MAX_NOS+1][MAX_NOME+2] ){
+int numero( const char *nome, int &nv, vector< string > &lista ){
     int i, achou;
 
     i = 0; achou = 0;
     while( !achou && i <= nv )
-        if( !( achou = !strcmp( nome, lista[i] ) ) )
+        if( !( achou = !lista[i].compare( nome ) ) )
             i++;
     if ( !achou ){
         if ( nv == MAX_NOS){
@@ -111,7 +109,7 @@ int numero( const char *nome, int &nv, char lista[MAX_NOS+1][MAX_NOME+2] ){
             exit( 1 );
         }
         nv++;
-        strcpy( lista[nv], nome );
+        lista[nv] = nome;
         return nv; /* novo no */
     }
     else{
@@ -123,6 +121,7 @@ int main( void ){
 
     ifstream arquivo;
     vector< elemento > netlist( MAX_ELEM );
+    vector< string > lista( MAX_NOME + 2 ); /*Tem que caber jx antes do nome */
     string txt;
 
     int
@@ -134,16 +133,13 @@ int main( void ){
     char
     /* Foram colocados limites nos formatos de leitura para alguma protecao
        contra excesso de caracteres nestas variaveis */
-        tipo,
-        lista[MAX_NOS+1][MAX_NOME+2]; /*Tem que caber jx antes do nome */
+        tipo;
 
     char na[MAX_NOME], nb[MAX_NOME], nc[MAX_NOME], nd[MAX_NOME];
 
     double
         g,
         Yn[MAX_NOS+1][MAX_NOS+2];
-
-    string nomearquivo;
 
     #if defined (WIN32) || defined(_WIN32)
     system( "cls" );
@@ -156,12 +152,13 @@ int main( void ){
     cout << "Versao " << versao << endl;
 
     /* Leitura do netlist */
-
+    string nomearquivo;
     bool arquivovalido = false;
     do{
         ne = 0;
         nv = 0;
-        strcpy( lista[0], "0" );
+
+        lista[0] = "0";
         cout << "Nome do arquivo com o netlist (ex: mna.net): ";
         cin >> nomearquivo;
         arquivo.open( nomearquivo, ifstream::in );
@@ -239,8 +236,8 @@ int main( void ){
                 cout << "As correntes extra excederam o numero de variaveis permitido (" << MAX_NOS << ")" << endl;
                 exit( 1 );
             }
-            strcpy( lista[nv], "j" ); /* Tem espaco para mais dois caracteres */
-            strcat( lista[nv], netlist[i].nome.c_str() );
+            lista[nv] = "j"; /* Tem espaco para mais dois caracteres */
+            lista[nv].append( netlist[i].nome );
             netlist[i].x = nv;
         }
         else if( tipo == 'H' ){
@@ -249,14 +246,17 @@ int main( void ){
                 cout << "As correntes extra excederam o numero de variaveis permitido (" << MAX_NOS << ")" << endl;
                 exit( 1 );
             }
-            strcpy( lista[nv-1], "jx" ); strcat( lista[nv-1], netlist[i].nome.c_str() );
+            lista[nv-1] = "jx";
+            lista[nv-1].append( netlist[i].nome );
             netlist[i].x = nv-1;
-            strcpy( lista[nv], "jy" ); strcat( lista[nv], netlist[i].nome.c_str() );
+            lista[nv] = "jy";
+            lista[nv].append( netlist[i].nome );
             netlist[i].y = nv;
         }
     }
     fflush( stdin );
     cin.get();
+
     /* Lista tudo */
     cout << "Variaveis internas: " << endl;
     for( i = 0; i <= nv; i++ )
